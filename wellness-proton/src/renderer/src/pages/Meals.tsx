@@ -17,7 +17,7 @@ function dayLabel(dateStr: string): string {
   return format(d, 'EEEE, MMM d')
 }
 
-type EditState = { id: number; name: string; slot: Meal['slot']; time: string; calories: string }
+type EditState = { id: number; name: string; slot: Meal['slot']; date: string; time: string; calories: string }
 
 export default function Meals(): React.JSX.Element {
   const today = format(new Date(), 'yyyy-MM-dd')
@@ -51,6 +51,7 @@ export default function Meals(): React.JSX.Element {
   const [showAdd, setShowAdd] = useState(false)
   const [name, setName] = useState('')
   const [slot, setSlot] = useState<Meal['slot']>('breakfast')
+  const [date, setDate] = useState(today)
   const [time, setTime] = useState('08:00')
   const [calories, setCalories] = useState('')
 
@@ -64,6 +65,7 @@ export default function Meals(): React.JSX.Element {
       id: m.id,
       name: m.name,
       slot: m.slot,
+      date: format(new Date(t), 'yyyy-MM-dd'),
       time: format(new Date(t), 'HH:mm'),
       calories: m.calories != null ? String(m.calories) : ''
     })
@@ -73,8 +75,8 @@ export default function Meals(): React.JSX.Element {
     e.preventDefault()
     if (!name.trim()) return
     create.mutate(
-      { name: name.trim(), slot, calories: calories ? Number(calories) : null, scheduled_at: `${today}T${time}:00` },
-      { onSuccess: () => { setName(''); setCalories(''); setShowAdd(false) } }
+      { name: name.trim(), slot, calories: calories ? Number(calories) : null, scheduled_at: `${date}T${time}:00` },
+      { onSuccess: () => { setName(''); setCalories(''); setDate(today); setShowAdd(false) } }
     )
   }
 
@@ -83,7 +85,7 @@ export default function Meals(): React.JSX.Element {
     if (!edit || !edit.name.trim()) return
     update.mutate({
       id: edit.id,
-      input: { name: edit.name.trim(), slot: edit.slot, calories: edit.calories ? Number(edit.calories) : null, time: edit.time }
+      input: { name: edit.name.trim(), slot: edit.slot, calories: edit.calories ? Number(edit.calories) : null, time: `${edit.date}T${edit.time}` }
     })
   }
 
@@ -133,12 +135,18 @@ export default function Meals(): React.JSX.Element {
                     {SLOTS.map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
                   <input
-                    type="time"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
                     className="px-3 py-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md text-sm"
                   />
                 </div>
+                <input
+                  type="time"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md text-sm"
+                />
                 <input
                   placeholder="Calories (kcal)"
                   type="number"
@@ -179,12 +187,18 @@ export default function Meals(): React.JSX.Element {
                     {SLOTS.map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
                   <input
-                    type="time"
-                    value={edit.time}
-                    onChange={(e) => setEdit((v) => v && ({ ...v, time: e.target.value }))}
+                    type="date"
+                    value={edit.date}
+                    onChange={(e) => setEdit((v) => v && ({ ...v, date: e.target.value }))}
                     className="px-3 py-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md text-sm"
                   />
                 </div>
+                <input
+                  type="time"
+                  value={edit.time}
+                  onChange={(e) => setEdit((v) => v && ({ ...v, time: e.target.value }))}
+                  className="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-md text-sm"
+                />
                 <input
                   placeholder="Calories (kcal)"
                   type="number"

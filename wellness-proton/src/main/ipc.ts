@@ -111,8 +111,7 @@ export function registerIpcHandlers(): void {
     'meals:update',
     (_e, id: number, input: { name: string; slot: string; calories: number | null; time: string }): void => {
       db.prepare(
-        `UPDATE meals SET name = ?, slot = ?, calories = ?,
-         scheduled_at = substr(scheduled_at, 1, 10) || 'T' || ? || ':00'
+        `UPDATE meals SET name = ?, slot = ?, calories = ?, scheduled_at = ? || ':00'
          WHERE id = ? AND user_id = ?`
       ).run(input.name, input.slot, input.calories, input.time, id, USER_ID)
     }
