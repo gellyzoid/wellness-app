@@ -1,0 +1,25 @@
+node_modules
+dist
+out
+.DS_Store
+.eslintcache
+*.log*
+
+# Environment & secrets
+.env
+.env.*
+
+# Database files (user data, not source code)
+*.db
+*.sqlite
+*.sqlite3
+
+# electron-builder cache
+electron-builder-cache
+
+# IDE
+.vscode
+.idea
+
+# OS
+Thumbs.db
